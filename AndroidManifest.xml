@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.yourpackagename">
+
+    <application>
+        <!-- ... outras configurações ... -->
+
+        <meta-data
+            android:name="com.dieam.reactnativepushnotification.notification_channel_name"
+            android:value="YOUR_CHANNEL_NAME" />
+        <meta-data
+            android:name="com.dieam.reactnativepushnotification.notification_channel_description"
+            android:value="YOUR_CHANNEL_DESCRIPTION" />
+    </application>
+
+</manifest>
