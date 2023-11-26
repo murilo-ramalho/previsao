@@ -23,7 +23,7 @@ const App = () => {
     try {
       const response = await axios.get(`https://brasilapi.com.br/api/cep/v2/${cep}`);
       const { state, city, neighborhood, street } = response.data;
-      setCepResult(`Estado: ${state}\nCidade: ${city}\nBairro: ${neighborhood}\nRua: ${street}`);
+      setCepResult(`Estado: ${state}\nCidade: ${city}\nBairro: ${neighborhood || 'Não informado'}\nRua: ${street || 'Não informado'}`);
 
       // Chama a função para buscar o ID da cidade
       const cityInfo = await fetchCityInfo(city);
@@ -37,6 +37,7 @@ const App = () => {
       }
     } catch (error) {
       setCepResult('CEP não encontrado');
+      setWeatherResult([]);
     }
   };
 
@@ -58,12 +59,32 @@ const App = () => {
     try {
       const response = await axios.get(`https://brasilapi.com.br/api/cptec/v1/clima/previsao/${cityId}/5`);
       
-      const weatherData = response.data;
+      const weatherData = response.data.clima;
 
-      return weatherData.clima;
+      return weatherData;
     } catch (error) {
       console.error('Erro ao obter a previsão do tempo:', error);
       return [];
+    }
+  };
+
+  const renderWeatherCondition = (condition) => {
+    switch (condition) {
+      case 'c':
+        return '☀️'; // Sol
+      case 'ci':
+        return '🌤️'; // Parcialmente nublado
+      case 'pnt':
+        return '⛅'; // Pancadas de chuva à tarde
+      case 'pn':
+        return '🌧️'; // Pancadas de chuva à noite
+      case 'ps':
+        return '🌧️'; // Pancadas de chuva pela manhã
+      case 'e':
+        return '🌩️'; // Encoberto com chuvas isoladas
+      // Adicione mais casos conforme necessário para outros tipos de condições climáticas
+      default:
+        return '';
     }
   };
 
@@ -79,10 +100,16 @@ const App = () => {
       <Button title="Consultar" onPress={() => fetchCep()} />
       <Text style={styles.resultText}>Resultado do CEP:</Text>
       <Text>{cepResult}</Text>
-      <Text style={styles.resultText}>Resultado da Previsão do Tempo:</Text>
+      <Text style={styles.resultText}>Previsão do Tempo:</Text>
       <ScrollView style={styles.scrollView}>
         {weatherResult.map((day, index) => (
-          <Text key={index}>{`Data: ${day.data}\nCondição: ${day.condicao_desc}\nMínima: ${day.min}°C\nMáxima: ${day.max}°C\n\n`}</Text>
+          <View key={index} style={styles.weatherDay}>
+            <Text style={styles.weatherDayText}>{`Data: ${day.data}`}</Text>
+            <Text>{`Condição: ${renderWeatherCondition(day.condicao)}`}</Text>
+            <Text>{`Mínima: ${day.min}°C, Máxima: ${day.max}°C`}</Text>
+            <Text>{`Condição: ${day.condicao_desc}`}</Text>
+            <Text>{`UV: ${day.indice_uv}`}</Text>
+          </View>
         ))}
       </ScrollView>
     </View>
@@ -108,7 +135,18 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   scrollView: {
-    maxHeight: 200, // Defina uma altura máxima para a ScrollView
+    maxHeight: 200,
+    marginTop: 8,
+  },
+  weatherDay: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 8,
+  },
+  weatherDayText: {
+    fontWeight: 'bold',
   },
 });
 
