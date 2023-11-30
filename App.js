@@ -21,7 +21,7 @@ const App = () => {
 
   const fetchCep = async () => {
     try {
-      const response = await axios.get(`https://brasilapi.com.br/api/cep/v2/${cep}`);
+      const response = await axios.get(`https://brasilapi.com.br/api/cep/v1/${cep}`);
       const { state, city, neighborhood, street } = response.data;
       setCepResult(`Estado: ${state}\nCidade: ${city}\nBairro: ${neighborhood}\nRua: ${street}`);
 
